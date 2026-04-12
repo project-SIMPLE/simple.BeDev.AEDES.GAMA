@@ -1,4 +1,4 @@
-model GamaToUnityUDP_Multi_model_VR
+model AEDESMapVR
 
 import "AEDES-Map.gaml"
 

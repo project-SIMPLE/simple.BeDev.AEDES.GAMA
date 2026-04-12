@@ -1,4 +1,4 @@
-model GamaToUnityUDP_Multi
+model AEDESMap
 
 global skills: [network] {
     // กำหนดขนาดพื้นที่เป็น 50x50
