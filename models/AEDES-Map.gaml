@@ -22,7 +22,7 @@ init {
         location <- home_locations[int(self)];
         heading <- float(home_rotations[int(self)]);
     } 
-    
+    //kuy
     create car number: 1 {
         location <- {7.0, 8.0};
         heading <- float(330);
@@ -35,6 +35,13 @@ init {
     create map_agent number: 1 {
         location <- {500, 500.0, -0.5};
     }
+    
+    create cat number: 2 {
+        location <- dog_locations[int(self)];
+    } 
+    
+    
+    
 }
 
 
@@ -62,6 +69,16 @@ species car {
 }
 
 
+
+species cat {
+    // ต้องประกาศตัวแปรไว้ที่นี่ก่อน
+    float heading; 
+
+    aspect default {
+        // ตอนนี้จะสามารถใช้ rotate: heading ได้แล้ว
+        draw triangle(0.5) color: #blue rotate: heading;
+    }
+}
 
 
 
