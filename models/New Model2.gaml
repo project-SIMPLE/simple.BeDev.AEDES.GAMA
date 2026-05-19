@@ -195,12 +195,12 @@ action receive_message (string id, string mes, string score_val, string name_val
             self.is_online <- true;
             
             // อัปเดตตำแหน่ง (ระบุพิกัด Z ให้ชัดเจนเพื่อให้ลอยเหนือพื้น)
-            self.location <- {x_val, y_val, 2.0}; 
+//            self.location <- {x_val, y_val, 2.0}; 
             
             self.score <- int(score_val);
             self.display_name <- name_val;
             
-            write "MATCHED: " + self.name + " moved to " + self.location;
+          //  write "MATCHED: " + self.name + " moved to " + self.location;
         }
     }
 }

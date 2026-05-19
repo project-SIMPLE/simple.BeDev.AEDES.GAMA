@@ -1,12 +1,12 @@
-model GamaToUnityUDP_Multi_model_VR
+model AEDESMapVR
 
 import "AEDES-Map.gaml"
 
 species unity_linker parent: abstract_unity_linker {
 	string player_species <- string(unity_player);
-	int max_num_players  <- 4;
-	int min_num_players  <- 1;
-	
+	int max_num_players  <- 6;
+	int min_num_players  <- 0;
+
 	
 	
 	unity_property up_map_agent;
@@ -27,7 +27,7 @@ species unity_linker parent: abstract_unity_linker {
 		//do add_background_geometries(map_agent,up_map_agent);
 	}
 	action define_properties {
-		unity_aspect map_agent_aspect <- prefab_aspect("Prefabs/Visual Prefabs/City/Vehicles/Map",1.0,-1.0,1.0,0.0,precision);
+		unity_aspect map_agent_aspect <- prefab_aspect("AEDES/Village/Map",1.0,-1.0,1.0,0.0,precision);
 		up_map_agent <- geometry_properties("map_agent","",map_agent_aspect,#no_interaction,false);
 		unity_properties << up_map_agent;
 
@@ -37,17 +37,17 @@ species unity_linker parent: abstract_unity_linker {
 //		unity_properties << up_default;
 
 
-		unity_aspect car_aspect <- prefab_aspect("Prefabs/Visual Prefabs/City/Vehicles/Car",1.0,0.0,1.0,0.0,precision);
+		unity_aspect car_aspect <- prefab_aspect("AEDES/Village/Car",1.0,0.0,1.0,0.0,precision);
 		up_car <- geometry_properties("car","",car_aspect,#no_interaction,false);
 		unity_properties << up_car;
 
 
-		unity_aspect dog_aspect <- prefab_aspect("Prefabs/Visual Prefabs/City/Vehicles/Car",1.0,0.0,1.0,0.0,precision);
+		unity_aspect dog_aspect <- prefab_aspect("AEDES/Village/SCOOTER",1.0,0.0,1.0,0.0,precision);
 		up_dog <- geometry_properties("dog","",dog_aspect,#no_interaction,false);
 		unity_properties << up_dog;
 
 
-		unity_aspect home_aspect <- prefab_aspect("Prefabs/Visual Prefabs/City/Vehicles/Home",0.8,-5.0,0.8,0.0,precision);
+		unity_aspect home_aspect <- prefab_aspect("AEDES/Village/Home",0.8,-5.0,0.8,0.0,precision);
 		up_home <- geometry_properties("home","",home_aspect,#no_interaction,false);
 		unity_properties << up_home;
 
