@@ -7,7 +7,7 @@ global skills: [network] {
     ); 
   
 
-	image_file map_image  <- image_file("../includes/WhatsApp Image 2026-05-22 at 13.17.20.jpeg");
+	image_file map_image  <- image_file("../includes/T_map_1.png");
 
 
 init {
@@ -24,12 +24,12 @@ init {
 species map_agent {
     aspect default {
         // 3. วาดรูปให้ขนาดเท่ากับ envelope (50x50)
-        draw map_image size: {45.0, 45.0};
+        //draw map_image size: {1000.0, 1000.0};
         
         // วาดขอบสีแดงล้อมรอบ agent เพื่อเช็คตำแหน่ง
         //draw square(1000.0) color: #brown;
         //draw square(1000.0) color: #ffffff;
-        //draw square(42.0) color: rgb(117, 117, 117);
+        draw square(42.0) color: rgb(117, 117, 117);
     }
 }
 
