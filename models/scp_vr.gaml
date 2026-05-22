@@ -1,6 +1,6 @@
 model GamaToUnityUDP_Multi_model_VR
 
-import "AEDES-Map.gaml"
+import "scp.gaml"
 
 species unity_linker parent: abstract_unity_linker {
 	//list<point> init_locations <- [{50.0, 50.0}];
@@ -178,7 +178,7 @@ species unity_linker parent: abstract_unity_linker {
 
 
 
-action receive_message (string id, string mes, string score_val, string name_val, float x_val, float y_val) {
+action receive_message (string id, string mes, string score_val, string name_val, string bb, string gb, string rb, string yb) {
     string clean_id <- lower_case(replace(id, " ", ""));
     
     // พยายามหาตัวที่ ID ตรงกันก่อน
@@ -188,7 +188,9 @@ action receive_message (string id, string mes, string score_val, string name_val
     if (target_p = nil and not empty(unity_player)) {
         target_p <- first(unity_player);
     }
-    
+//    action receive_message (string id, string mes) {
+//		write "Player " + id + " send the message: " + mes + " hp: " + mes;
+//	}
     if (target_p != nil) {
         ask target_p {
             self.last_update <- gama.machine_time;
@@ -481,9 +483,54 @@ display point_player1 parent: test {
 }
 
 
+display bb parent: test {
+    chart "Player Scores Comparison" type: histogram background: #white {
+        // ใช้ each.name แทน medical_id กรณีที่ display_name ยังว่างอยู่
+        datalist (unity_player collect (each.display_name = "" ? each.name : each.display_name)) 
+                 value: (unity_player collect each.score) 
+                 color: [#blue, #red, #green, #orange]; 
+    }
+}
 
-	
+	display "Datalist bar chart" type:2d {
+			chart "Datalist bar chart" type:histogram 
+			series_label_position: onchart
+			{
+				datalist legend:["cycle","cosinus normalized","offsetted cosinus normalized"] 
+					style: bar
+					value:[cycle,(sin(100*cycle) +  1) * cycle/2,(sin(100*(cycle+30)) + 1) * cycle/2] 
+					color:[#green,#black,#purple];
+			}
+		}
 
+display yb parent: test {
+    chart "Player Scores Comparison" type: histogram background: #white {
+        // ใช้ each.name แทน medical_id กรณีที่ display_name ยังว่างอยู่
+        datalist (unity_player collect (each.display_name = "" ? each.name : each.display_name)) 
+                 value: (unity_player collect each.score) 
+                 color: [#blue, #red, #green, #orange]; 
+    }
+}
+
+
+display gb parent: test {
+    chart "Player Scores Comparison" type: histogram background: #white {
+        // ใช้ each.name แทน medical_id กรณีที่ display_name ยังว่างอยู่
+        datalist (unity_player collect (each.display_name = "" ? each.name : each.display_name)) 
+                 value: (unity_player collect each.score) 
+                 color: [#blue, #red, #green, #orange]; 
+    }
+}
+
+
+display rb parent: test {
+    chart "Player Scores Comparison" type: histogram background: #white {
+        // ใช้ each.name แทน medical_id กรณีที่ display_name ยังว่างอยู่
+        datalist (unity_player collect (each.display_name = "" ? each.name : each.display_name)) 
+                 value: (unity_player collect each.score) 
+                 color: [#blue, #red, #green, #orange]; 
+    }
+}
 
         
     } 
