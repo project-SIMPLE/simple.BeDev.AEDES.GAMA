@@ -10,6 +10,10 @@ species unity_linker parent: abstract_unity_linker {
 	
 	
 	
+	bool is_saved <- false;
+	
+	
+	
 	unity_property up_map_agent;
 	//unity_property up_default;
 
@@ -17,18 +21,98 @@ species unity_linker parent: abstract_unity_linker {
 	list<point> init_locations <- define_init_locations();
 
 	list<point> define_init_locations {
-		return [{22.5,22.5,0.0},{22.5,22.5,0.0},{50.0,50.0,0.0},{50.0,50.0,0.0}];
+		return [{22.5,22.5,0.0},{22.5,22.5,0.0},{22.5,22.5,0.0},{22.5,22.5,0.0}];
 	}
  
  
 // list<point> init_locations <- [{22.5, 22.5}];
+	string base_name <- "AEDES_Data";
+    string extension <- ".csv";
+    string folder_path <- "../includes/DataCSV/";
+    string final_file_name; 
 
 
 	init {
 		do define_properties;
 		//player_unity_properties <- [nil,nil,nil,nil];
 		do add_background_geometries(map_agent,up_map_agent);
+		
+		
+		
+		int i <- 0;
+        string temp_name <- base_name + extension;
+        loop while: file_exists(folder_path + temp_name) {
+            i <- i + 1;
+            temp_name <- base_name + i + extension;
+        }
+        final_file_name <- temp_name;
+        write "บันทึกข้อมูลลงไฟล์: " + final_file_name;
+		
+		
 	}
+	
+	
+	
+//reflex save_data {
+//    if (not empty(unity_player)) {
+//        
+//        // ดึงข้อมูลผู้เล่นคนแรกมาตรวจสอบเงื่อนไข
+//        unity_player target_p <- first(unity_player);
+//        
+//        // 🛑 ตรวจสอบเงื่อนไข: ถ้า Unity ส่งสัญญาณจบเกมมาเป็น 0 และยังไม่เคยบันทึกไฟล์นี้มาก่อน
+//        if (target_p.display_end_game = 0 and not is_saved) {
+//            
+//            save [
+//                target_p.name, 
+//                target_p.display_name, 
+//                target_p.score             // คะแนน
+//               
+//            ] 
+//            to: folder_path + final_file_name 
+//            rewrite: false 
+//            header: true;
+//            
+//            // 🔒 ล็อคสถานะทันที เพื่อให้ใน 1 เกมบันทึกข้อมูลอันล่าสุดเพียงแถวเดียว ไม่บันทึกซ้ำซ้อน
+//            is_saved <- true;
+//            write "💾 [SUCCESS] บันทึกผลสถิติเกมชุดสุดท้ายลงไฟล์เรียบร้อยแล้ว: " + final_file_name;
+//        }
+//    }
+//}
+
+
+
+
+reflex save_data {
+    if (not empty(unity_player)) {
+        
+        // 1. ดึงผู้เล่นคนแรกมาเพื่อเช็คสัญญาณจบเกม (จบเกมพร้อมกัน)
+        unity_player target_p <- first(unity_player);
+        
+        // 🛑 ตรวจสอบเงื่อนไข: ถ้า Unity ส่งสัญญาณจบเกมมาเป็น 0 และยังไม่เคยบันทึกไฟล์นี้มาก่อน
+        if (target_p.display_end_game = 0 and not is_saved) {
+            
+            // 🔄 ใช้ loop เพื่อวนลูปบันทึกข้อมูลของผู้เล่นทุกคน (รองรับได้ถึง 4 คน หรือตามที่เชื่อมต่อจริง)
+            loop p over: unity_player {
+                save [
+                    p.name, 
+                    p.display_name, 
+                    p.score             // คะแนนของผู้เล่นแต่ละคน
+                ] 
+                to: folder_path + final_file_name 
+                rewrite: false 
+                header: true;
+            }
+            
+            // 🔒 ล็อคสถานะทันที เพื่อไม่ให้เกิดการบันทึกซ้ำซ้อนใน cycle ถัดไป
+            is_saved <- true;
+            write "💾 [SUCCESS] บันทึกผลสถิติเกมของผู้เล่นทั้งหมดลงไฟล์เรียบร้อยแล้ว: " + final_file_name;
+        }
+    }
+}
+
+
+	
+	
 	action define_properties {
 		unity_aspect map_agent_aspect <- prefab_aspect("Prefabs/Visual Prefabs/City/Vehicles/Map",1.0,-1.0,1.0,0.0,precision);
 		up_map_agent <- geometry_properties("map_agent","",map_agent_aspect,#no_interaction,false);
@@ -65,7 +149,7 @@ species unity_linker parent: abstract_unity_linker {
 	reflex send_message when: every(1 #cycle) and not empty(unity_player) and start_simulation {
 		
 		// แสดงข้อความใน console เพื่อเอาไว้เช็คสถานะการทำงาน
-		write "Sending Start status and Cycle: " + cycle;
+		//write "Sending Start status and Cycle: " + cycle;
 		
 		// 📤 ส่ง message ไปยัง player ทุกคนใน Unity
 		// เพิ่มคู่ Key-Value -> "status"::"Start" เข้าไปใน Map เพื่อส่งบอก Unity
@@ -82,7 +166,8 @@ species unity_linker parent: abstract_unity_linker {
 
 
 
-action receive_message (string id, string mes, string score_val, string name_val) {
+action receive_message (string id, string mes, string score_val, string name_val
+	,string end_game) {
     string clean_id <- lower_case(replace(id, " ", ""));
     
     // พยายามหาตัวที่ ID ตรงกันก่อน
@@ -103,7 +188,8 @@ action receive_message (string id, string mes, string score_val, string name_val
             
             self.score <- int(score_val);
             self.display_name <- name_val;
-            
+            self.display_end_game <- int(end_game);
+           //  write "game is " + self.display_end_game;
           //  write "MATCHED: " + self.name + " moved to " + self.location;
         }
     }
@@ -139,7 +225,7 @@ bool to_display <- true;
 	string ip <- ""; // <--- เพิ่มบรรทัดนี้เพื่อเก็บค่า IP ของผู้เล่นแต่ละคน
 	string display_name <- ""; // <--- เพิ่มบรรทัดนี้เพื่อเก็บชื่อที่จะแสดงผล
 
-
+	int display_end_game <- -1;
 
 
 
@@ -153,13 +239,13 @@ bool to_display <- true;
 
 	
 	
-//	aspect default {
-//    // วาดวงกลมตามสถานะสี
-//    draw circle(player_size/2.0) at: location + {0, 0, z_offset} color: color;
-//    
-//    // ✅ แก้ไขตรงนี้: ลบเครื่องหมาย : หลังคำว่า text
-//    draw (display_name = "" ? name : display_name) at: location + {0, 0, z_offset + 1} size: 10 color: #black;
-//}
+	aspect default {
+    // วาดวงกลมตามสถานะสี
+    draw circle(player_size/2.0) at: location + {0, 0, z_offset} color: color;
+    
+    // ✅ แก้ไขตรงนี้: ลบเครื่องหมาย : หลังคำว่า text
+    draw (display_name = "" ? name : display_name) at: location + {0, 0, z_offset + 1} size: 10 color: #black;
+}
 	
 	
 	// Action นี้จะถูกเรียกอัตโนมัติเมื่อมี Player หลุดจาก Unity
@@ -171,16 +257,16 @@ bool to_display <- true;
         // ให้มันตะโกนบอกคะแนนตัวเองใน Console ทุกๆ step
          write name + " has score: " + score;
     }
-    reflex check_connection {
-        // ถ้าไม่มีข้อมูลส่งมาจาก Unity เกิน 3 วินาที (3000ms)
-        if (gama.machine_time - last_update > 30000) {
-            if (is_online) {
-                is_online <- false;
-                color <- #blue; // 🔵 เปลี่ยนเป็นสีฟ้าเมื่อหลุด
-                write "🔌 [OFFLINE] " + name + " (Display: " + display_name + ") ข้อมูลขาดการติดต่อ";
-            }
-        }
-    }
+//    reflex check_connection {
+//        // ถ้าไม่มีข้อมูลส่งมาจาก Unity เกิน 3 วินาที (3000ms)
+//        if (gama.machine_time - last_update > 30000) {
+//            if (is_online) {
+//                is_online <- false;
+//                color <- #blue; // 🔵 เปลี่ยนเป็นสีฟ้าเมื่อหลุด
+//                write "🔌 [OFFLINE] " + name + " (Display: " + display_name + ") ข้อมูลขาดการติดต่อ";
+//            }
+//        }
+//    }
 
     reflex debug_score {
         // write name + " has score: " + score; // ปิดไว้ก่อนก็ได้ถ้ามันเยอะเกินไป
