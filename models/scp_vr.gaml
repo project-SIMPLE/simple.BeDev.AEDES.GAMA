@@ -5,7 +5,7 @@ import "scp.gaml"
 species unity_linker parent: abstract_unity_linker {
 	//list<point> init_locations <- [{50.0, 50.0}];
 	string player_species <- string(unity_player);
-	int max_num_players  <- 1;
+	int max_num_players  <- 3;
 	int min_num_players  <- 1;
 	
 	
@@ -19,8 +19,8 @@ species unity_linker parent: abstract_unity_linker {
 	list<point> init_locations <- define_init_locations();
 
 	list<point> define_init_locations {
-//		return [{78.7,-81.4,10.0},{22.5,22.5,0.0},{50.0,50.0,0.0},{50.0,50.0,0.0}];
-		return [{78.7,-81.4,10.0}];
+		return [{78.7,-81.4,10.0},{78.7,-81.4,10.0},{78.7,-81.4,10.0}];
+//		return [{78.7,-81.4,10.0}];
 	}
  
  
