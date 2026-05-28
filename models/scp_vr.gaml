@@ -194,14 +194,14 @@ reflex save_data {
 	bool do_send_world <- true;
 	
 	// 🔁 ทำงานทุก 100 cycle และต้องมี player อยู่
-	reflex send_message when: every(100 #cycle) and not empty(unity_player){
+	reflex send_message when: every(1 #cycle) and not empty(unity_player){
 		
 		// แสดงข้อความใน console
 		//write "Send message: "  + cycle;
 		
 		// 📤 ส่ง message ไปยัง player ทุกคนใน Unity
 		// รูปแบบเป็น map: "ชื่อข้อมูล"::ค่า
-		//do send_message players: unity_player as list mes: ["cycle":: cycle];
+		do send_message players: unity_player as list mes: ["cycle":: cycle, "status":: "Start"];
 	}
 	
 
