@@ -194,7 +194,7 @@ reflex save_data {
 	bool do_send_world <- true;
 	
 	// 🔁 ทำงานทุก 100 cycle และต้องมี player อยู่
-	reflex send_message when: every(1 #cycle) and not empty(unity_player){
+	reflex send_message when: every(1 #cycle) and not empty(unity_player) and start_simulation {
 		
 		// แสดงข้อความใน console
 		//write "Send message: "  + cycle;
