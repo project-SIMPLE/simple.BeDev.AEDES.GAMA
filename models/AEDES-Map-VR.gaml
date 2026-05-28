@@ -189,7 +189,7 @@ action receive_message (string id, string mes, string score_val, string name_val
             self.score <- int(score_val);
             self.display_name <- name_val;
             self.display_end_game <- int(end_game);
-           //  write "game is " + self.display_end_game;
+             write "game is " + self.display_end_game;
           //  write "MATCHED: " + self.name + " moved to " + self.location;
         }
     }
