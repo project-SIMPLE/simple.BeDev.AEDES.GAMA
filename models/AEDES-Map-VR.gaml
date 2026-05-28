@@ -207,7 +207,7 @@ action receive_message (string id, string mes, string score_val, string name_val
 
 
 species unity_player parent: abstract_unity_player{
-	float player_size <- 1.0;
+	float player_size <- 3.0;
 	rgb color <- #red;
 	//float cone_distance <- 5.0 * player_size;
 	float cone_distance <- 4.0;
