@@ -126,40 +126,7 @@ experiment Main type: gui {
            
         }
         
-        display "Futuristic Display" background: #black {
-            graphics "HUD Layer" {
-                // กำหนดพิกัดกึ่งกลางหน้าจอ
-                point center_pt <- {60, 60};
-                float ring_radius <- 20.0; 
-                
-                // 1. วาดวงแหวนพื้นหลัง (Static Ring)
-                draw circle(ring_radius) at: center_pt color: #transparent border: #darkgray width: 2.0;
-                
-                // 2. คำนวณสีและมุมของวงแหวนตามเวลาที่เหลือ
-                rgb active_color <- #cyan;
-                if (progress_val < 0.2) { active_color <- #red; }
-                
-                float end_angle <- -90.0 + (360.0 * progress_val);
-                
-                // 3. วาดวงแหวนที่เคลื่อนที่ (Progress Arc)
-                draw arc(ring_radius, -90.0, end_angle) at: center_pt color: #transparent border: active_color width: 6.0;
-
-                // 4. วาดตัวเลขเวลา (Timer Text) - ใช้ anchor: #center เพื่อให้อยู่กลางวงกลมพอดี
-                draw time_display at: center_pt color: active_color font: font("Arial", 100, #bold) anchor: #center;
-                
-                // 5. วาดสถานะ Active/Paused ด้านล่าง
-                string status_txt <- "PAUSED";
-                rgb status_col <- #gray;
-                if (start_simulation) {
-                    status_txt <- "ACTIVE";
-                    status_col <- #green;
-                }
-                draw status_txt at: {60, 100} color: status_col font: font("Arial", 50, #bold) anchor: #center;
-                
-                // 6. วาดหัวข้อด้านบน
-                draw "REAL-WORLD TIMER (5 MIN)" at: {60, 25} color: #white font: font("Arial", 10) anchor: #center;
-            }
-        }
+       
     }
 }
 
