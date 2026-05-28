@@ -240,12 +240,14 @@ bool to_display <- true;
 	
 	
 	aspect default {
-    // วาดวงกลมตามสถานะสี
-    draw circle(player_size/2.0) at: location + {0, 0, z_offset} color: color;
-    
-    // ✅ แก้ไขตรงนี้: ลบเครื่องหมาย : หลังคำว่า text
-    draw (display_name = "" ? name : display_name) at: location + {0, 0, z_offset + 1} size: 10 color: #black;
-}
+		if to_display {
+			if selected {
+				 draw circle(player_size) at: location + {0, 0, z_offset} color: rgb(#blue, 0.5);
+			}
+			draw circle(player_size/2.0) at: location + {0, 0, z_offset} color: color ;
+			draw player_perception_cone() color: rgb(color, 0.5);
+		}
+	}
 	
 	
 	// Action นี้จะถูกเรียกอัตโนมัติเมื่อมี Player หลุดจาก Unity
