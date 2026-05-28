@@ -116,7 +116,7 @@ experiment Main type: gui {
     
     output {
     	
-        display "test"  {
+        display "test" {
         	// วาดแกน XYZ เพื่อให้เห็นจุด {0,0} ชัดเจน
             // target: คือจุดที่กล้องมองไป (ให้ตรงกับพิกัด Agent ของคุณ)
             camera #default location: {78.7, -81.4, 200.0} target: {78.7, -81.4, 0.0};
