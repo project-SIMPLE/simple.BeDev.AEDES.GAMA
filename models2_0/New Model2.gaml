@@ -1,11 +1,11 @@
 model GamaToUnityUDP_Multi_model_VR
 
-import "scp.gaml"
+import "New Model.gaml"
 
 species unity_linker parent: abstract_unity_linker {
 	//list<point> init_locations <- [{50.0, 50.0}];
 	string player_species <- string(unity_player);
-	int max_num_players  <- 1;
+	int max_num_players  <- 4;
 	int min_num_players  <- 1;
 	
 	
@@ -17,46 +17,18 @@ species unity_linker parent: abstract_unity_linker {
 	list<point> init_locations <- define_init_locations();
 
 	list<point> define_init_locations {
-		return [{78.7,-81.4,0.0},{22.5,22.5,0.0},{50.0,50.0,0.0},{50.0,50.0,0.0}];
+		return [{22.5,22.5,0.0},{22.5,22.5,0.0},{50.0,50.0,0.0},{50.0,50.0,0.0}];
 	}
  
  
 // list<point> init_locations <- [{22.5, 22.5}];
 
 
-
-string base_name <- "scp_data";
-    string extension <- ".csv";
-    string folder_path <- "../includes/SCP_CSV/";
-    string final_file_name; 
-
-
-
 	init {
 		do define_properties;
 		//player_unity_properties <- [nil,nil,nil,nil];
 		do add_background_geometries(map_agent,up_map_agent);
-		
-		
-		int i <- 0;
-        string temp_name <- base_name + extension;
-        
-        // วนลูปตรวจสอบว่าไฟล์มีอยู่หรือไม่ ถ้ามีให้เพิ่มเลขต่อท้ายไปเรื่อยๆ
-        loop while: file_exists(folder_path + temp_name) {
-            i <- i + 1;
-            temp_name <- base_name + i + extension;
-            }
-            final_file_name <- temp_name;
-        write "บันทึกข้อมูลลงไฟล์: " + final_file_name;
-		
-		
 	}
-	
-	
-	//reflex save_data {
-//        save ["Cycle: " + cycle, "Time: " + time] to: folder_path + final_file_name rewrite: false header: true;
-//    }
-	
 	action define_properties {
 		unity_aspect map_agent_aspect <- prefab_aspect("Prefabs/Visual Prefabs/City/Vehicles/Map",1.0,-1.0,1.0,0.0,precision);
 		up_map_agent <- geometry_properties("map_agent","",map_agent_aspect,#no_interaction,false);
@@ -206,23 +178,29 @@ string base_name <- "scp_data";
 
 
 
-// ใน species unity_linker ส่วน action receive_message:
-action receive_message (string id, string mes, string score_val, string name_val, 
-    string rib, string rig, string riy, 
-    string gib, string gir, string giy, 
-    string bir, string big, string biy, 
-    string yir, string yig, string yib) {
+action receive_message (string id, string mes, string score_val, string name_val, float x_val, float y_val) {
     string clean_id <- lower_case(replace(id, " ", ""));
+    
+    // พยายามหาตัวที่ ID ตรงกันก่อน
     unity_player target_p <- first(unity_player where (lower_case(replace(each.name, " ", "")) = clean_id));
+    
+    // ถ้าหาไม่เจอ (เช่นในเคส Player_85 ของคุณ) ให้เลือกเอเจนท์ตัวแรกที่มีในระบบมาใช้แทน
+    if (target_p = nil and not empty(unity_player)) {
+        target_p <- first(unity_player);
+    }
     
     if (target_p != nil) {
         ask target_p {
-            self.red_in_blue <- int(rib); self.red_in_green <- int(rig); self.red_in_yellow <- int(riy);
-            self.green_in_blue <- int(gib); self.green_in_red <- int(gir); self.green_in_yellow <- int(giy);
-            self.blue_in_red <- int(bir); self.blue_in_green <- int(big); self.blue_in_yellow <- int(biy);
-            self.yellow_in_red <- int(yir); self.yellow_in_green <- int(yig); self.yellow_in_blue <- int(yib);
+            self.last_update <- gama.machine_time;
+            self.is_online <- true;
+            
+            // อัปเดตตำแหน่ง (ระบุพิกัด Z ให้ชัดเจนเพื่อให้ลอยเหนือพื้น)
+//            self.location <- {x_val, y_val, 2.0}; 
+            
             self.score <- int(score_val);
             self.display_name <- name_val;
+            
+          //  write "MATCHED: " + self.name + " moved to " + self.location;
         }
     }
 }
@@ -271,24 +249,7 @@ action receive_message (string id, string mes, string score_val, string name_val
 
 
 species unity_player parent: abstract_unity_player{
-
-
-// ขยะสีแดงที่ทิ้งผิด
-    int red_in_blue <- 0; int red_in_green <- 0; int red_in_yellow <- 0;
-    // ขยะสีเขียวที่ทิ้งผิด
-    int green_in_blue <- 0; int green_in_red <- 0; int green_in_yellow <- 0;
-    // ขยะสีน้ำเงินที่ทิ้งผิด
-    int blue_in_red <- 0; int blue_in_green <- 0; int blue_in_yellow <- 0;
-    // ขยะสีเหลืองที่ทิ้งผิด
-    int yellow_in_red <- 0; int yellow_in_green <- 0; int yellow_in_blue <- 0;
-
-// ... ตัวแปรเดิมของคุณ ...
-    int bb_val <- 0; int gb_val <- 0; int rb_val <- 0; int yb_val <- 0;
-    int bw_val <- 0; int gw_val <- 0; int rw_val <- 0; int yw_val <- 0;
-
-	
-	float player_size <- 10.0;
-	
+	float player_size <- 1.0;
 	rgb color <- #red;
 	//float cone_distance <- 5.0 * player_size;
 	float cone_distance <- 4.0;
@@ -463,9 +424,6 @@ bool to_display <- true;
 
 
 experiment vr_xp parent:"Main" autorun: false type: unity {
-	
-    
-    
     float minimum_cycle_duration <- 0.1;
     string unity_linker_species <- string(unity_linker);
     list<string> displays_to_hide <- ["test", "test"];
@@ -485,14 +443,9 @@ experiment vr_xp parent:"Main" autorun: false type: unity {
         display test_VR parent: test {
             species unity_player;
             
-            
-            
-            
-            
             // ใช้คำสั่งดักจับเมาส์แบบดั้งเดิมที่เสถียรที่สุด
             event #mouse_down {
                 float t <- gama.machine_time;
-                
                 if (t - t_ref) > 500 {
                     
                     // --- ลองใช้ #user_location แทน #event_location ---
@@ -518,7 +471,7 @@ experiment vr_xp parent:"Main" autorun: false type: unity {
 
 
 
-display point_player1 type: 2d {
+display point_player1 parent: test {
     chart "Player Scores Comparison" type: histogram background: #white {
         // ใช้ each.name แทน medical_id กรณีที่ display_name ยังว่างอยู่
         datalist (unity_player collect (each.display_name = "" ? each.name : each.display_name)) 
@@ -528,40 +481,9 @@ display point_player1 type: 2d {
 }
 
 
-// สำหรับ Blue Bin Chart: แสดงขยะสีอื่น (Red, Green, Yellow) ที่ทิ้งผิดลงถังฟ้า
-display "Blue Bin Chart" type: 2d {
-    chart "Blue Bin: Wrong items" type: histogram series_label_position: onchart {
-        data "Red Waste" value: unity_player collect each.red_in_blue color: #red;
-        data "Green Waste" value: unity_player collect each.green_in_blue color: #green;
-        data "Yellow Waste" value: unity_player collect each.yellow_in_blue color: #yellow;
-    }
-}
-display "Green Bin Chart" type: 2d {
-    chart "Green Bin: Wrong items" type: histogram series_label_position: onchart {
-        data "Red Waste" value: unity_player collect each.red_in_green color: #red;
-        data "Blue Waste" value: unity_player collect each.blue_in_green color: #blue;
-        data "Yellow Waste" value: unity_player collect each.yellow_in_green color: #yellow;
-    }
-}
-// ทำแบบเดียวกันกับ Red Bin และ Yellow Bin
-
-display "Red Bin Chart" type: 2d {
-    chart "Red Bin: Wrong items" type: histogram series_label_position: onchart {
-        data "Blue Waste" value: unity_player collect each.blue_in_red color: #blue;
-        data "Green Waste" value: unity_player collect each.green_in_red color: #green;
-        data "Yellow Waste" value: unity_player collect each.yellow_in_red color: #yellow;
-    }
-}
-display "Yellow Bin Chart" type: 2d {
-    chart "yellow Bin: Wrong items" type: histogram series_label_position: onchart {
-        data "Red Waste" value: unity_player collect each.red_in_yellow color: #red;
-        data "Blue Waste" value: unity_player collect each.blue_in_yellow color: #blue;
-        data "green Waste" value: unity_player collect each.green_in_yellow color: #green;
-    }
-}
-// ทำแบบเดียวกันกับ Red Bin และ Yellow Bin
 
 
 
+        
     } 
 }
